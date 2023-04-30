@@ -1,0 +1,132 @@
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgo=">
+<html>
+
+<body>
+    <div id="In">
+        <p>
+            <font size="16"><strong>Welcome!    <strong></font>
+            <strong>Hi,  <label id="username"></label></strong>
+        </p>
+        <div>
+            <h1><u>Message</u></h1>
+            <label id="error"></label>
+            <table id="msg_table" style="word-wrap:break-word; table-layout:fixed;">
+            </table>
+        </div>
+        <div style="margin-top: 20px;">
+            <label>Leave Message: </label>
+        </div>
+        <div>
+            <textarea id="txt" cols="50" rows="10" placeholder="input messsage here"></textarea>
+        </div>
+        <div style="margin-left: 120px">
+            <button id='sent_msg_btn' onclick="sent_msg()"> Submit </button>
+            <button class='logout' onclick="LogOut()">Log Out</button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        var username = getParam('acc');
+        if (username == null) {
+            var dataUrl= `http://140.112.29.206:8081/getusername` //post account and password
+            axios.get(dataUrl)
+            .then( (res) => {
+                if (res.headers.status == '200 OK') {
+                    document.getElementById("username").innerText = res.data.result;
+                }
+                else {
+                    alert('Permission Denied!');
+                }
+            })
+            .catch( (err) => {
+                console.log(err);
+          });
+        } else {
+            document.getElementById("username").innerText = username;
+        }
+
+        var dataUrl= `http://140.112.29.206:8081/index.html/req_msg_board` 
+            axios.get(dataUrl)
+            .then( (res) => {
+                if (res.headers.status == '200 OK') {
+                    var msg = JSON.parse(res.data.result);
+                    var key_list = Object.keys(msg);
+                    let tableContent = "";
+                    key_list.forEach(key => {
+                        tableContent += "<tr><td>"+msg[key].datetime+"</td><td style='float:right;'>"+msg[key].username+":  </td><td>"+msg[key].text+"</td></tr>";
+                        
+                    });
+                    document.getElementById('msg_table').innerHTML = "<tbody>" + tableContent + '</table>';
+                } else {
+                    document.getElementById('error').innerHTML = 'No Message';
+                }
+            })
+            .catch( (err) => {
+                console.log(err);
+          });
+        
+
+        function getParam(paramName) {
+            paramValue = "", isFound = !1;
+            if (this.location.search.indexOf("?") == 0 && this.location.search.indexOf("=") > 1) {
+                arrSource = decodeURI(this.location.search).substring(1, this.location.search.length).split("&"), i = 0;
+                while (i < arrSource.length && !isFound) arrSource[i].indexOf("=") > 0 && arrSource[i].split("=")[0].toLowerCase() == paramName.toLowerCase() && (paramValue = arrSource[i].split("=")[1], isFound = !0), i++
+            }
+            return paramValue == "" && (paramValue = null), paramValue
+        }
+        
+        function LogOut () {
+            var dataUrl= `http://140.112.29.206:8081/Logout` //post account and password
+            axios.get(dataUrl)
+            .then( (res) => {
+                if (res.headers.status == '301 Moved Permanently') {
+                alert('Logout Successfull');
+                window.location.href = res.data.Location;
+                }
+                else {
+                    alert('No Response!');
+                }
+            })
+            .catch( (err) => {
+                console.log(err);
+          });
+        }
+
+        function getCookie(cname) {
+            var name = cname + "=";
+            var decodedCookie = decodeURIComponent(document.cookie);
+            var ca = decodedCookie.split(';');
+            for(var i = 0; i <ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
+        function sent_msg() {
+            var text = document.getElementById('txt').value;
+            var dataUrl= `http://140.112.29.206:8081/index.html/leave_msg?text=${text}` //post account and password
+            axios.get(dataUrl)
+            .then( (res) => {
+                if (res.headers.status == '200 OK') {
+                alert('Submit Successfull');
+                window.location.reload();
+                }
+            })
+            .catch( (err) => {
+                console.log(err);
+          });
+
+        }
+
+    </script>
+
+</body>
+
+</html>
+

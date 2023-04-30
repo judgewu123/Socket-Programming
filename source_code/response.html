@@ -1,0 +1,109 @@
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgo=">
+<html>
+    <body>
+      <div id="Login">
+        <p><font size="16"><strong>Personal Information<strong></font></p>
+        <p><strong>Name: </strong> myname</p>
+        <p><strong>Student ID: </strong> my id</p>
+        <p><strong>Email: </strong> my mail</p>
+          Username<input type="text" id="log_acc">
+          password<input type="text" id="log_pwd">
+          <button class='Signbtn' onclick="show_sign()" >Sign In</button>
+          <button class='loginbtn' onclick="Login()" >Log In</button>
+      </div>
+    <div id="In" style="display:none">
+      <p><font size="16"><strong>Welcome! <strong></font></p>
+      <p><strong>Hi, </strong></p>
+      <p class="username"><strong> </strong></p>
+      <button class='logout' onclick="LogOut()" >Log Out</button>
+    </div>
+    <div id="Sign" style="display:none">
+      <p><font size="16"><strong>Sign in <strong></font></p>
+        Username<input type="text" id="sign_acc">
+        password<input type="text" id="sign_pwd">
+      <p class="username"><strong> </strong></p>
+      <button class='Signbtn' onclick="Signin()" > Sign In</button>
+      <button class='back' onclick="location.reload()" > Back</button>
+    </div>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+      <script>
+        var signinbtn = document.querySelector('.signinbtn');
+        var loginbtn = document.querySelector('.loginbtn');
+        var username = document.getElementById('log_acc');
+
+        function show_sign () {
+          document.getElementById('Sign').style.display="";
+          document.getElementById('Login').style.display="none";
+        }
+
+        function Signin () {
+          var username = document.getElementById('sign_acc').value;
+          var password = document.getElementById('sign_pwd').value;
+
+          if (username.length > 9) {
+            alert('The user name should less than 10 characters!')
+            return 
+          }
+          if (password.length > 9) {
+            alert('The user name should less than 10 characters!')
+            return
+          }
+
+          var dataUrl= "api" //post username and password
+          axios.get(`http://140.112.29.206:8081/Sign?acc=${username}&pwd=${password}`)
+          .then( (res) => {
+            if (res.data.result == 'TRUE') {
+              var username = res.data;
+              alert('Sign Successfull!!');
+              document.getElementById('Sign').style.display="none";
+              document.getElementById('Login').style.display="";
+            } else {
+              alert(res.data.result);
+              alert('The user name is already in use, please try again!');
+              return
+            }
+          })
+          .catch( (err) => {
+              console.log(err);
+          });
+
+        };
+
+        function Login () {
+          //todo
+          var username = document.getElementById('log_acc').value;
+          var password = document.getElementById('log_pwd').value;
+          if (username.length > 9) {
+            alert('The user name should less than 10 characters!')
+            return 
+          }
+          if (password.length > 9) {
+            alert('The user name should less than 10 characters!')
+            return
+          }
+
+          var dataUrl= `http://140.112.29.206:8081/Login?acc=${username}&pwd=${password}` //post account and password
+          axios.get(dataUrl)
+          .then( (res) => {
+              console.log(document.cookies);
+              // console.log(res.status);
+              if (res.headers.status == "200 OK") {
+                alert('Login Successfull');
+                window.location.href = res.data.Location;
+              }
+              else {
+                alert('The user name or password error!')
+              }
+              // document.getElementsByClassName("username").innerHTML = username;
+              // document.getElementById('In').style.display="";
+              // document.getElementById('Login').style.display="none";
+          })
+          .catch( (err) => {
+              console.log(err);
+          });
+        };
+
+      </script>
+    </body>
+</html>
